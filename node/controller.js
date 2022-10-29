@@ -105,6 +105,10 @@ export const deleteQuote = (req, res) => {
   }
 };
 
+export const handleOptions = (_, res) => {
+  sendResponse(res, 200, { message: 'OK.' });
+};
+
 export const notFound = (_, res) => {
   sendResponse(res, 404, { message: 'This page does not exist.' });
 };
