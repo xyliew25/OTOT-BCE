@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <NewQuote @create-quote="createQuote" />
-    <Quotes :quotes="quotes" @edit-quote="editQuote" @delete-quote="deleteQuote" />
+    <Quotes :quotes="quotes" :isMoody="isMoody" @edit-quote="editQuote" @delete-quote="deleteQuote" />
   </div>
 </template>
 
@@ -15,6 +15,9 @@ export default {
   components: {
     NewQuote,
     Quotes,
+  },
+  props: {
+    isMoody: Boolean,
   },
   data() {
     return {

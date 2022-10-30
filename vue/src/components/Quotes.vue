@@ -1,5 +1,5 @@
 <template>
-  <b-table bordered :items="quotes" :fields="fields" responsive="sm" head-variant="dark">
+  <b-table bordered :items="quotes" :fields="fields" responsive="sm" :head-variant="isMoody ? 'dark' : 'light'">
     <template #cell(edit)="row">
       <b-button variant="outline-secondary" size="sm" @click="row.toggleDetails(); populateText(row.item.id, row.item.text);" class="mr-2">
         <b-icon icon="x" v-if="row.detailsShowing"></b-icon>
@@ -36,6 +36,7 @@ export default {
   name: "Quotes",
   props: {
     quotes: Array,
+    isMoody: Boolean,
   },
   data() {
     return {
