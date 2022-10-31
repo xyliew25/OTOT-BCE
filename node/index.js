@@ -1,33 +1,35 @@
 import 'dotenv/config';
-import http from 'http';
-import url from 'url';
+import express from 'express';
+import cors from 'cors';
 
-import { getQuotes, createQuote, updateQuote, deleteQuote, handleOptions, notFound } from './controller.js';
+import { getUser, createUser, deleteUser } from './userController.js';
+import { getQuotes, getQuote, createQuote, updateQuote, deleteQuote } from './quoteController.js';
+import { login, authenticate, authorize } from './auth.js';
 
-// Server initialization
-export const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'content-type');
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors());
+app.options('*', cors());
 
-  const urlparse = url.parse(req.url, true);
+// Users
+app.get('/api/users/:id', getUser);
+app.post('/api/users', createUser);
+app.delete('/api/users/:id', deleteUser);
+app.post('/login', login);
 
-  if (urlparse.pathname === '/api/quotes' && req.method === 'GET') {
-    getQuotes(req, res);
-  } else if (urlparse.pathname === '/api/quotes' && req.method === 'POST') {
-    createQuote(req, res);
-  } else if (urlparse.pathname === '/api/quotes' && req.method === 'PUT') {
-    updateQuote(req, res);
-  } else if (urlparse.pathname === '/api/quotes' && req.method === 'DELETE') {
-    deleteQuote(req, res);
-  } else if (urlparse.pathname === '/api/quotes' && req.method === 'OPTIONS') {
-    handleOptions(req, res);
-  } else {
-    notFound(req, res);
-  }
+// Quotes
+app.get('/api/quotes', getQuotes);
+app.get('/api/quotes/:id', getQuote);
+app.post('/api/quotes', authenticate, createQuote);
+app.put('/api/quotes/:id', authenticate, authorize, updateQuote);
+app.delete('/api/quotes/:id', authenticate, authorize, deleteQuote);
+
+app.get('*', (_, res) => {
+  res.status(404).json({ message: 'This page does not exist.' });
 });
 
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}.`);
 });

@@ -41,53 +41,49 @@ export const testQuotes = [
 // Database initialization
 let dbPath;
 if (process.env.ENV == 'DEV') {
-  dbPath = process.env.DB_PATH;
+  dbPath = process.env.QUOTE_DB_PATH;
   initFile(dbPath, sampleQuotes);
 } else if (process.env.ENV == 'TEST') {
-  dbPath = process.env.TEST_DB_PATH;
+  dbPath = process.env.TEST_QUOTE_DB_PATH;
   resetFile(dbPath, testQuotes);
 }
 const rawQuotes = readFile(dbPath);
 export let quotes = JSON.parse(rawQuotes);
-export let lastindex = quotes.length === 0 ? -1 : quotes[quotes.length - 1].id;
+export let lastIndex = quotes.length === 0 ? -1 : quotes[quotes.length - 1].id;
 
-// CRUD
-export const createQuote = (newQuote) => {
-  const { text, author } = newQuote; 
+export const createQuote = (text, author) => {
   const quote = {
-    id: ++lastindex, 
-    text, 
-    author: author ? author : 'Anonymous',
+    id: ++lastIndex,
+    text,
+    author,
   };
   quotes.push(quote);
   writeFile(dbPath, quotes);
   return quote;
-} 
+};
 
 export const getQuotes = () => {
   return quotes;
-}
+};
 
 export const getQuote = (id) => {
   const quote = quotes.filter(quote => quote.id == id);
   return quote.length > 0 ? quote[0] : null;
-}
+};
 
-export const updateQuote = (id, data) => {
-  const { text, author } = data;
+export const updateQuote = (id, text) => {
   let updatedQuote;
   quotes.forEach((quote, index) => {
     if (quote.id == id) {
       quotes[index].text = text ? text : quotes[index].text;
-      quotes[index].author = author ? author : quotes[index].author;
       updatedQuote = quote;
     }
   });
   writeFile(dbPath, quotes);
   return updatedQuote;
-}
+};
 
 export const deleteQuote = (id) => {
   quotes = quotes.filter(quote => quote.id != id);
   writeFile(dbPath, quotes);
-}
+};

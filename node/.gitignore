@@ -1,2 +1,4 @@
 node_modules
-*.json
+quotes.json
+testQuotes.json
+users.json
