@@ -22,8 +22,8 @@ deploy:
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_KEY
   region: "ap-southeast-1"
-  app: "my-quotes"
-  env: "Myquotes-env-1"
-  bucket_name: "bucket-my-quotes"
+  app: "moody-quotes"
+  env: "Moodyquotes-env"
+  bucket_name: "moody-quotes-bucket"
   on:
     branch: main

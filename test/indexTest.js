@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 
 describe('Quotes API', () => {
   const testUser = {
-    username: 'Test user 4',
+    username: 'User 4',
     role: 'admin',
   };
   let accessToken;
