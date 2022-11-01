@@ -15,14 +15,14 @@ export const isValidRole = (role) => {
 };
 
 // Permissions
-export const isAdmin = (username) => {
-  const user = _getUser(username);
-  return user && user.role === ROLE.ADMIN;
+export const isAdmin = async (username) => {
+  const user = await _getUser(username);
+  return user && user.role == ROLE.ADMIN;
 };
 
-export const isOwn = (username, quoteId) => {
-  const quote = _getQuote(quoteId);
-  return quote && username === quote.author;
+export const isOwn = async (username, quoteId) => {
+  const quote = await _getQuote(quoteId);
+  return quote && username == quote.author;
 };
 
 // Auth
@@ -35,7 +35,7 @@ export const login = (req, res) => {
 export const authenticate = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  if (token === null) {
+  if (token == null) {
     return res.status(401).json({ message: 'Not authenticated.' });
   }
 
@@ -43,24 +43,25 @@ export const authenticate = (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: 'Not authenticated.' });
     }
+    
     req.user = { username };
+    next();
   });
-  next();
 };
 
-export const authorize = (req, res, next) => {
+export const authorize = async (req, res, next) => {
   const { username } = req.user;
-  if (isAdmin(username)) {
-    next();
+  if (!username) {
+    return res.status(400).json({ message: 'Missing user username.' });
   }
-
   const id = req.params.id;
   if (!id) {
     return res.status(400).json({ message: 'Missing quote ID.' });
   }
-  if (isOwn(username, id)) {
-    next();
-  }
 
-  return res.status(403).json({ message: 'Not authorized.' });
+  if (await isOwn(username, id) || await isAdmin(username)) {
+    next();
+  } else {
+    return res.status(403).json({ message: 'Not authorized.' });
+  }
 };

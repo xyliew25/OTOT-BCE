@@ -24,17 +24,17 @@ export const testQuotes = [
   {
     id: 0,
     text: 'Test quote 1.',
-    author: 'Author 1'
+    author: 'Author 1',
   },
   {
     id: 1,
     text: 'Test quote 2.',
-    author: 'Author 2'
+    author: 'Author 2',
   },
   {
     id: 2,
     text: 'Test quote 3.',
-    author: 'Anonymous'
+    author: 'Author 3',
   }
 ];
 

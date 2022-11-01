@@ -2,6 +2,7 @@ import {
   createUser as _createUser,
   getUsers as _getUsers,
   getUser as _getUser,
+  updateUser as _updateUser,
   deleteUser as _deleteUser,
 } from './userRepo.js';
 import { isValidRole } from './auth.js';
@@ -44,6 +45,28 @@ export const getUser = async (req, res) => {
     return res.status(200).json(user);
   } else {
     return res.status(400).json({ message: `User with username ${username} does not exist.` });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  const username = req.params.id;
+  if (!username) {
+    return res.status(400).json({ message: 'Missing user username.' });
+  }
+
+  const { role } = req.body;
+  if (!role) {
+    return res.status(400).json({ message: 'Missing user role.' });
+  }
+  if (!isValidRole(role)) {
+    return res.status(400).json({ message: 'Invalid user role.' });
+  }
+
+  try {
+    const updatedUser = await _updateUser(username, role);
+    return res.status(200).json(updatedUser);
+  } catch (e) {
+    return res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
