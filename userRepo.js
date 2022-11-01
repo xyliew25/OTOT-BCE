@@ -13,7 +13,7 @@ redisClient.on('error', err => {
 });
 
 // Database initialization
-const mongoDbUri = process.env.ENV === 'DEV' ? process.env.MONGO_DB_URI : process.env.MONGO_TEST_DB_URI;
+const mongoDbUri = process.env.MONGO_DB_URI;
 mongoose.connect(mongoDbUri, { useNewUrlParser: true, useUnifiedTopology: true });
 const mongoDb = mongoose.connection;
 mongoDb.on('error', console.error.bind(console, 'MongoDB connection error: '));

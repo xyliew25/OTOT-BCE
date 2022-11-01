@@ -1,9 +1,22 @@
 language: node_js
+
 node_js:
   - 16
-script:
+
+services:
+  - mongodb
+  - redis-server
+
+install: 
   - npm ci
-  - npm run test
+
+before_script:
+  - sleep 15 # MongoDB may not immediately accept connections
+  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+
+script: 
+  - npm test
+
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_ACCESS_KEY
