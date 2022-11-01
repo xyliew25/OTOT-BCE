@@ -1,12 +1,13 @@
 import {
   createUser as _createUser,
+  getUsers as _getUsers,
   getUser as _getUser,
   deleteUser as _deleteUser,
 } from './userRepo.js';
 import { isValidRole } from './auth.js';
 
 // CRUD
-export const createUser = (req, res) => {
+export const createUser = async (req, res) => {
   const { username, role } = req.body;
 
   if (!username) {
@@ -20,20 +21,25 @@ export const createUser = (req, res) => {
   }
 
   try {
-    const createdUser = _createUser(username, role);
+    const createdUser = await _createUser(username, role);
     return res.status(201).json(createdUser);
   } catch (e) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
-export const getUser = (req, res) => {
-  const username = req.params.username;
+export const getUsers = async (_, res) => {
+  const users = await _getUsers();
+  return res.status(200).json(users);
+};
+
+export const getUser = async (req, res) => {
+  const username = req.params.id;
   if (!username) {
     return res.status(400).json({ message: 'Missing user username.' });
   }
 
-  const user = _getUser(username);
+  const user = await _getUser(username);
   if (user) {
     return res.status(200).json(user);
   } else {
@@ -41,14 +47,14 @@ export const getUser = (req, res) => {
   }
 };
 
-export const deleteUser = (req, res) => {
-  const username = req.params.username;
+export const deleteUser = async (req, res) => {
+  const username = req.params.id;
   if (!username) {
     return res.status(400).json({ message: 'Missing user username.' });
   }
 
   try {
-    _deleteUser(username);
+    await _deleteUser(username);
     return res.status(200).json({ username });
   } catch (e) {
     return res.status(500).json({ message: 'Internal server error.' });

@@ -1,29 +1,46 @@
 import 'dotenv/config';
+import mongoose from 'mongoose';
+import redis from 'redis';
 
-import { initFile, readFile, writeFile } from './fileHelper.js';
+import UserModel from './userModel.js';
+
+// Cache initialization
+const EXPIRATION = 10;
+const redisClient = redis.createClient();
+await redisClient.connect();
+redisClient.on('error', err => {
+  console.log('Redis connection error: ' + err);
+});
 
 // Database initialization
-let dbPath;
-if (process.env.ENV == 'DEV') {
-  dbPath = process.env.USER_DB_PATH;
-  initFile(dbPath, []);
-}
-const rawUsers = readFile(dbPath);
-export let users = JSON.parse(rawUsers);
+const mongoDbUri = process.env.MONGO_DB_URI;
+mongoose.connect(mongoDbUri, { useNewUrlParser: true, useUnifiedTopology: true });
+const mongoDb = mongoose.connection;
+mongoDb.on('error', console.error.bind(console, 'MongoDB connection error: '));
 
-export const createUser = (username, role) => {
-  const user = { username, role };
-  users.push(user);
-  writeFile(dbPath, users);
+export const createUser = async (username, role) => {
+  const user = new UserModel({ username, role });
+  await user.save();
   return user;
 };
 
-export const getUser = (username) => {
-  const user = users.filter(user => user.username == username);
-  return user.length > 0 ? user[0] : null;
+export const getUsers = async () => {
+  const cachedUsers = await redisClient.get('users');
+  if (cachedUsers) {
+    console.log('cache hit');
+    return JSON.parse(cachedUsers);
+  }
+
+  console.log('cache miss');
+  const users = await UserModel.find();
+  await redisClient.setEx('users', EXPIRATION, JSON.stringify(users));
+  return users;
 };
 
-export const deleteUser = (username) => {
-  users = users.filter(user => user.username != username);
-  writeFile(dbPath, users);
+export const getUser = async (username) => {
+  return await UserModel.findOne({ username }).exec();
+};
+
+export const deleteUser = async (username) => {
+  return await UserModel.deleteOne({ username });
 };

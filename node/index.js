@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 
-import { getUser, createUser, deleteUser } from './userController.js';
+import { getUsers, getUser, createUser, deleteUser } from './userController.js';
 import { getQuotes, getQuote, createQuote, updateQuote, deleteQuote } from './quoteController.js';
 import { login, authenticate, authorize } from './auth.js';
 
@@ -13,6 +13,7 @@ app.use(cors());
 app.options('*', cors());
 
 // Users
+app.get('/api/users', getUsers);
 app.get('/api/users/:id', getUser);
 app.post('/api/users', createUser);
 app.delete('/api/users/:id', deleteUser);
