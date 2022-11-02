@@ -40,12 +40,13 @@ export const testQuotes = [
 
 // Database initialization
 let dbPath;
-if (process.env.ENV == 'DEV') {
-  dbPath = process.env.QUOTE_DB_PATH;
-  initFile(dbPath, sampleQuotes);
-} else if (process.env.ENV == 'TEST') {
+
+if (process.env.ENV == 'TEST') {
   dbPath = process.env.TEST_QUOTE_DB_PATH;
   resetFile(dbPath, testQuotes);
+} else {
+  dbPath = process.env.QUOTE_DB_PATH;
+  initFile(dbPath, sampleQuotes);
 }
 const rawQuotes = readFile(dbPath);
 export let quotes = JSON.parse(rawQuotes);

@@ -6,14 +6,22 @@ import UserModel from './userModel.js';
 
 // Cache initialization
 const EXPIRATION = 10;
-const redisClient = redis.createClient();
+const redisClient = process.env.ENV == 'PROD' 
+  ? redis.createClient({
+    socket: {
+      host: process.env.REDIS_CLOUD_HOST,
+      port: process.env.REDIS_CLOUD_PORT,
+    },
+    password: process.env.REDIS_CLOUD_PASSWORD,
+  })
+  : redis.createClient();
 await redisClient.connect();
 redisClient.on('error', err => {
   console.log('Redis connection error: ' + err);
 });
 
 // Database initialization
-const mongoDbUri = process.env.MONGO_DB_URI;
+const mongoDbUri = process.env.ENV == 'PROD' ? process.env.MONGODB_CLOUD_URI : process.env.MONGODB_LOCAL_URI;
 mongoose.connect(mongoDbUri, { useNewUrlParser: true, useUnifiedTopology: true });
 const mongoDb = mongoose.connection;
 mongoDb.on('error', console.error.bind(console, 'MongoDB connection error: '));
