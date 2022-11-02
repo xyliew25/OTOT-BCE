@@ -43,6 +43,7 @@ export default {
       });
       const json = await res.json();
       this.isMoody = json.isRaining;
+      console.log("isRaining: " + json.isRaining);
     }
   },
   mounted() {
